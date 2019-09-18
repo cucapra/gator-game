@@ -1,2 +1,2 @@
 # gator-game
-Large graphics project implemented with the Gator language
+Large graphics project implemented with the [Gator](https://github.com/cucapra/linguine) language
