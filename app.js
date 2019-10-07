@@ -222,7 +222,7 @@ function webGLStart(meshes){
 
 window.onload = function (){
     OBJ.downloadMeshes({
-        'obj_name': 'http://localhost:1337/caiman.obj',
-        'obj_name2': 'http://localhost:1337/lion-cub.obj'
+        'obj_name': 'http://localhost:1337/models/caiman.obj',
+        'obj_name2': 'http://localhost:1337/models/lion-cub.obj'
     }, webGLStart);
 }
