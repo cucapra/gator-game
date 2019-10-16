@@ -9,7 +9,7 @@ Use the package manager [npm](https://www.npmjs.com/package/npm) to install depe
 npm install
 ```
 
-We are using a python simple server on port 1337.
+We are using a python simple server on port 1337. Run the command below and navigate to `localhost:1337`.
 
 ```bash
 python3 -m http.server 1337
