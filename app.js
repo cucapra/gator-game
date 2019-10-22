@@ -9,6 +9,9 @@
 //   var mesh = new OBJ.Mesh(data);
 // });
 
+import { mat4 } from 'gl-matrix';
+import { OBJ } from 'webgl-obj-loader';
+
 // WebGL context
 var gl = {};
 // the canvas element
@@ -35,7 +38,7 @@ window.requestAnimFrame = (function (){
 })();
 
 function initWebGL(canvas){
-    try{
+    try {
         // Try to grab the standard context. If it fails, fallback to experimental.
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     }
@@ -52,18 +55,10 @@ function initWebGL(canvas){
 }
 
 function getShader(gl, id){
+    // Refers to external HTML
     var shaderScript = document.getElementById(id);
     if (!shaderScript){
         return null;
-    }
-
-    var str = "";
-    var k = shaderScript.firstChild;
-    while (k){
-        if (k.nodeType == 3){
-            str += k.textContent;
-        }
-        k = k.nextSibling;
     }
 
     var shader;
@@ -75,7 +70,7 @@ function getShader(gl, id){
         return null;
     }
 
-    gl.shaderSource(shader, str);
+    // gl.shaderSource(shader, "");
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
@@ -180,7 +175,7 @@ function animate(){
     app.timeNow = new Date().getTime();
     app.elapsed = app.timeNow - app.lastTime;
     if (app.lastTime != 0){
-        // do animations
+        mat4.rotateZ(app.mvMatrix, app.mvMatrix, .01);
     }
     app.lastTime = app.timeNow;
 }
@@ -222,7 +217,7 @@ function webGLStart(meshes){
 
 window.onload = function (){
     OBJ.downloadMeshes({
-        'obj_name': 'http://localhost:1337/models/caiman.obj',
-        'obj_name2': 'http://localhost:1337/models/lion-cub.obj'
+        'obj_name': 'http://localhost:1234/models/caiman.obj',
+        'obj_name2': 'http://localhost:1234/models/lion-cub.obj'
     }, webGLStart);
 }

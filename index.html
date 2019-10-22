@@ -29,13 +29,14 @@
             vTransformedNormal = uNMatrix * aVertexNormal;
         }
     </script>
-    <script type="text/javascript" src="gl-matrix.js"></script>
+    <!-- <script type="text/javascript" src="gl-matrix.js"></script> -->
     <script type='text/javascript' src='webgl-obj-loader.js'></script>
-    <script type='text/javascript' src='app.js'></script>
+    
 </head>
 <body style='padding:0; margin:0;'>
     <div style='margin:0 auto; width:800px;'>
         <canvas id="mycanvas" style="border: none;" width="800" height="500"></canvas>
     </div>
+    <script type="module" src='app.js'></script>
 </body>
 </html>

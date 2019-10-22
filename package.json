@@ -4,9 +4,12 @@
   "description": "Large graphics project implemented using Gator.",
   "main": "app.js",
   "dependencies": {
+    "@types/gl-matrix": "^2.4.0",
+    "gl-matrix": "^2.8.1",
     "node-teapot": "^3.1.0",
     "requirejs": "^2.3.6",
-    "webgl-obj-loader": "^2.0.3"
+    "webgl-obj-loader": "^2.0.3",
+    "parcel": "^1.12.3"
   },
   "devDependencies": {},
   "scripts": {
