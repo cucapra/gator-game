@@ -6,10 +6,10 @@
   "dependencies": {
     "@types/gl-matrix": "^2.4.0",
     "gl-matrix": "^2.8.1",
-    "node-teapot": "^3.1.0",
+    "parcel": "^1.12.4",
     "requirejs": "^2.3.6",
-    "webgl-obj-loader": "^2.0.3",
-    "parcel": "^1.12.3"
+    "teapot": "^1.0.0",
+    "webgl-obj-loader": "^2.0.3"
   },
   "devDependencies": {},
   "scripts": {

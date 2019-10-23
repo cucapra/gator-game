@@ -1,6 +1,5 @@
 // var fs = require('fs');
 
-// import OBJ from 'webgl-obj-loader';
 // var meshPath = './development/models/sphere.obj';
 // var opt = { encoding: 'utf8' };
 
@@ -9,8 +8,10 @@
 //   var mesh = new OBJ.Mesh(data);
 // });
 
+import OBJ from 'webgl-obj-loader';
 import { mat4 } from 'gl-matrix';
-import { OBJ } from 'webgl-obj-loader';
+import * as teapot from 'teapot';
+// import { OBJ } from 'webgl-obj-loader';
 
 // WebGL context
 var gl = {};
@@ -86,6 +87,7 @@ function initShaders(){
     var vertexShader = getShader(gl, "shader-vs");
 
     shaderProgram = gl.createProgram();
+    console.log(vertexShader);
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
@@ -216,8 +218,5 @@ function webGLStart(meshes){
 }
 
 window.onload = function (){
-    OBJ.downloadMeshes({
-        'obj_name': 'http://localhost:1234/models/caiman.obj',
-        'obj_name2': 'http://localhost:1234/models/lion-cub.obj'
-    }, webGLStart);
+    webGLStart(teapot);
 }
