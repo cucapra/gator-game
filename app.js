@@ -8,9 +8,11 @@
 //   var mesh = new OBJ.Mesh(data);
 // });
 
-import OBJ from 'webgl-obj-loader';
-import { mat4 } from 'gl-matrix';
+import * as OBJ from 'webgl-obj-loader';
+import { mat4, mat3 } from 'gl-matrix';
+import * as normals from 'normals';
 import * as teapot from 'teapot';
+import pack from 'array-pack-2d';
 // import { OBJ } from 'webgl-obj-loader';
 
 // WebGL context
@@ -98,7 +100,6 @@ function initShaders(){
     var vertexShader = getShader(gl, "shader-vs");
 
     shaderProgram = gl.createProgram();
-    console.log(vertexShader);
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
@@ -122,7 +123,7 @@ function initShaders(){
     shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
 }
 
-function drawObject(model){
+function drawObject(obj){
     /*
      Takes in a model that points to a mesh and draws the object on the scene.
      Assumes that the setMatrixUniforms function exists
@@ -130,24 +131,24 @@ function drawObject(model){
      */
 //    gl.useProgram(shaderProgram);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, model.mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.vertexBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, obj.mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.normalBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, model.mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.normalBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, obj.mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    if (model.mesh.textures.length){
+    if (obj.mesh.textures.length){
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.textureBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, model.mesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.textureBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, obj.mesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
     }
     else{
         gl.disableVertexAttribArray(shaderProgram.textureCoordAttribute);
     }
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.mesh.indexBuffer);
     setMatrixUniforms();
-    gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, obj.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
 
 function mvPushMatrix(){
@@ -168,8 +169,9 @@ function setMatrixUniforms(){
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
     var normalMatrix = mat3.create();
-    mat4.toInverseMat3(app.mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
+    // mat3.fromMat4(app.mvMatrix, normalMatrix);
+    // mat3.invert(normalMatrix, normalMatrix);
+    // mat3.transpose(normalMatrix);
     gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
 }
 
@@ -195,16 +197,15 @@ function animate(){
 
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
-    mat4.identity(app.mvMatrix);
-    // move the camera
     
-    mat4.translate(app.mvMatrix, [0, 0, -15]);
-    // mat4.translate(app.mvMatrix, [0, 0, -5]);
+    mat4.identity(app.mvMatrix);
+    mat4.perspective(app.pMatrix, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
+    // mat4.translate(app.mvMatrix, [0, 0, -15]);
+    // move the camera
+    mat4.translate(app.mvMatrix, app.mvMatrix, [0, 0, -5]);
     // set up the scene
     mvPushMatrix();
-        drawObject(app.models.obj_name);
-        drawObject(app.models.obj_name2);
+    drawObject(app.models.obj_name);
     mvPopMatrix();
 }
 
@@ -225,9 +226,12 @@ function webGLStart(meshes){
     
     
     tick()
-//    drawScene();
+    // drawScene();
 }
 
 window.onload = function (){
-    webGLStart(teapot);
+    OBJ.downloadMeshes({
+        'obj_name': 'models/caiman.obj',
+        'obj_name2': 'models/lion-cub.obj'
+    }, webGLStart);
 }
