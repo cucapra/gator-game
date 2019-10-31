@@ -153,7 +153,7 @@ function drawObject(obj){
 
 function mvPushMatrix(){
     var copy = mat4.create();
-    mat4.set(app.mvMatrix, copy);
+    mat4.copy(copy, app.mvMatrix);
     app.mvMatrixStack.push(copy);
 }
 
@@ -169,9 +169,9 @@ function setMatrixUniforms(){
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
     var normalMatrix = mat3.create();
-    // mat3.fromMat4(app.mvMatrix, normalMatrix);
-    // mat3.invert(normalMatrix, normalMatrix);
-    // mat3.transpose(normalMatrix);
+    mat3.fromMat4(app.mvMatrix, normalMatrix);
+    mat3.invert(normalMatrix, normalMatrix);
+    mat3.transpose(normalMatrix, normalMatrix);
     gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
 }
 
@@ -198,13 +198,18 @@ function animate(){
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    mat4.identity(app.mvMatrix);
-    mat4.perspective(app.pMatrix, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
+    mat4.identity(app.mvMatrix, app.mvMatrix);
+    
+    
+    mat4.perspective(app.pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0);
     // mat4.translate(app.mvMatrix, [0, 0, -15]);
     // move the camera
-    mat4.translate(app.mvMatrix, app.mvMatrix, [0, 0, -5]);
+    mat4.translate(app.mvMatrix, app.mvMatrix, [0, 0, -15]);
     // set up the scene
     mvPushMatrix();
+    // console.log(app.pMatrix)
+    // console.log(app.mvMatrix)
+    console.log(app.mvMatrix)
     drawObject(app.models.obj_name);
     mvPopMatrix();
 }
