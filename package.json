@@ -2,10 +2,11 @@
   "name": "gator-game",
   "version": "1.0.0",
   "description": "Large graphics project implemented using Gator.",
-  "main": "model.js",
+  "main": "app.js",
   "dependencies": {
-    "webgl-obj-loader": "^2.0.3",
-    "node-teapot": "^3.1.0"
+    "node-teapot": "^3.1.0",
+    "requirejs": "^2.3.6",
+    "webgl-obj-loader": "^2.0.3"
   },
   "devDependencies": {},
   "scripts": {

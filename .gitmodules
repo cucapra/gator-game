@@ -1,0 +1,3 @@
+[submodule "linguine"]
+	path = linguine
+	url = https://github.com/cucapra/linguine
