@@ -187,10 +187,29 @@ function animate(){
 
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
+    mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 1, 2000.0, app.pMatrix);
+    app.pMatrix = [0.24, 0,0,0,0,1.73,0,0,0,0,-1,-1,0,0,-2,0];
     mat4.identity(app.mvMatrix);
     // move the camera
+    radius = 200;
+    var cameraMatrix = mat4.create();
+    var cameraAngleRadians = 0;
+    cameraMatrix = yRotation(cameraAngleRadians)
+    console.log("CAMERA0", cameraMatrix);
+    mat4.translate(cameraMatrix, cameraMatrix, [0, 0, radius * 1.5]);
+    cameraMatrix = [1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
     
+    // Make a view matrix from the camera matrix.
+    var viewMatrix = mat4.create();;
+    mat4.inverse(cameraMatrix,viewMatrix);
+    
+    // move the projection space to view space (the space in front of
+    // the camera)
+    var viewProjectionMatrix = mat4.create();;
+    mat4.multiply(app.pMatrix, viewMatrix,viewProjectionMatrix);
+    console.log("BEFORE: " + app.mvMatrix);
+    app.mvMatrix = viewProjectionMatrix;
+    console.log("AFTER: " + app.mvMatrix);
     mat4.translate(app.mvMatrix, [0, 0, -15]);
     // mat4.translate(app.mvMatrix, [0, 0, -5]);
     // set up the scene
@@ -198,6 +217,18 @@ function drawScene(){
         drawObject(app.models.obj_name);
         drawObject(app.models.obj_name2);
     mvPopMatrix();
+}
+
+function   yRotation(angleInRadians) {
+    var c = Math.cos(angleInRadians);
+    var s = Math.sin(angleInRadians);
+
+    return [
+      c, 0, -s, 0,
+      0, 1, 0, 0,
+      s, 0, c, 0,
+      0, 0, 0, 1,
+    ];
 }
 
 function tick(){
