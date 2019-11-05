@@ -1,0 +1,6 @@
+// using "glsl_defs.lgl";
+
+void main() {
+    float[4] color = [0.0, 0.0, 0.0, 1.0];
+    float[4] gl_FragColor = color;
+}
