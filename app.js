@@ -213,14 +213,16 @@ function drawScene(){
     mat4.translate(app.mvMatrix, [0, 0, -15]);
     
     app.cMatrix = yRotation(app.cameraAngle+=.1);
+
+    //For rotating the camera itself
+    //From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
+    mat4.rotateX(app.cMatrix,app.rotation[0]++*Math.PI/180);
+    mat4.rotateY(app.cMatrix,app.rotation[1]++*Math.PI/180);
+    mat4.rotateZ(app.cMatrix,app.rotation[2]++*Math.PI/180);
+
+    //Translate camera backwards after rotation to look into the scene
     mat4.translate(app.cMatrix,[0, 0, 20]);
 
-    //For rotating the camera itself (change app.rotation to use)
-    //From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
-    mat4.rotateX(app.cMatrix,app.rotation[0]*Math.PI/180);
-    mat4.rotateY(app.cMatrix,app.rotation[1]*Math.PI/180);
-    mat4.rotateZ(app.cMatrix,app.rotation[2]*Math.PI/180);
-    // mat4.translate(app.mvMatrix, [0, 0, -5]);
     // set up the scene
     mvPushMatrix();
         drawObject(app.models.obj_name);
