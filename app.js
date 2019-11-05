@@ -22,9 +22,8 @@ app.models = {};
 app.mvMatrix = mat4.create();
 app.mvMatrixStack = [];
 app.pMatrix = mat4.create();
-app.cMatrix = mat4.create();
-app.rotation = [0,0,0];
-app.cameraAngle = 0;
+app.cMatrix = mat4.create(); //Camera matrix
+app.rotation = [0,0,0]; // rotation for camera
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -161,7 +160,6 @@ function mvPopMatrix(){
 function setMatrixUniforms(){
     // From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
     mat4.inverse(app.cMatrix, app.mvMatrix);      //Obtain Model-View matrix from Camera Matrix
-    // displayMatrix(cMatrix);
 
     gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, app.pMatrix);
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
