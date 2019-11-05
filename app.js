@@ -22,6 +22,8 @@ app.models = {};
 app.mvMatrix = mat4.create();
 app.mvMatrixStack = [];
 app.pMatrix = mat4.create();
+app.cMatrix = mat4.create();
+app.rotation = [0,0,0];
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -156,6 +158,9 @@ function mvPopMatrix(){
 }
 
 function setMatrixUniforms(){
+    // mat4.inverse(mvMatrix,cMatrix);     //Obtain Camera Matrix from Model-View Matrix
+    // displayMatrix(mvMatrix);
+
     gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, app.pMatrix);
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
@@ -192,6 +197,10 @@ function drawScene(){
     // move the camera
     
     mat4.translate(app.mvMatrix, [0, 0, -15]);
+    rotation = [90,90,90];
+    mat4.rotateX(app.mvMatrix,app.rotation[0]++*Math.PI/180);
+    mat4.rotateY(app.mvMatrix,app.rotation[1]++*Math.PI/180);
+    mat4.rotateZ(app.mvMatrix,app.rotation[2]++*Math.PI/180);
     // mat4.translate(app.mvMatrix, [0, 0, -5]);
     // set up the scene
     mvPushMatrix();
