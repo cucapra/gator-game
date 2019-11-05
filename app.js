@@ -159,6 +159,7 @@ function mvPopMatrix(){
 }
 
 function setMatrixUniforms(){
+    // From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
     mat4.inverse(app.cMatrix, app.mvMatrix);      //Obtain Model-View matrix from Camera Matrix
     // displayMatrix(cMatrix);
 
@@ -215,6 +216,7 @@ function drawScene(){
     mat4.translate(app.cMatrix,[0, 0, 20]);
 
     //For rotating the camera itself (change app.rotation to use)
+    //From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
     mat4.rotateX(app.cMatrix,app.rotation[0]*Math.PI/180);
     mat4.rotateY(app.cMatrix,app.rotation[1]*Math.PI/180);
     mat4.rotateZ(app.cMatrix,app.rotation[2]*Math.PI/180);
