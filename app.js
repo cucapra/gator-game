@@ -59,30 +59,32 @@ function initWebGL(canvas){
 
 function getShader(gl, id){
     // Refers to external HTML
-    var shaderScript = document.getElementById(id);
+    if (id === "shader-fs")
+        var shaderScript = require("./compiled_fragment.frag")
+    else
+        var shaderScript = require("./vertex_orig.vert")
+    console.log(shaderScript)
     if (!shaderScript){
         return null;
     }
 
-    var str = "";
-    var k = shaderScript.firstChild;
-    while (k){
-        if (k.nodeType == 3){
-            str += k.textContent;
-        }
-        k = k.nextSibling;
-    }
+    // var str = "";
+    // var k = shaderScript.firstChild;
+    // while (k){
+    //     if (k.nodeType == 3){
+    //         str += k.textContent;
+    //     }
+    //     k = k.nextSibling;
+    // }
 
     var shader;
-    if (shaderScript.type == "x-shader/x-fragment"){
+    if (id === "shader-fs"){
         shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (shaderScript.type == "x-shader/x-vertex"){
+    } else {
         shader = gl.createShader(gl.VERTEX_SHADER);
-    } else{
-        return null;
     }
 
-    gl.shaderSource(shader, str);
+    gl.shaderSource(shader, shaderScript);
     gl.compileShader(shader);
 
   
@@ -100,6 +102,7 @@ function initShaders(){
     var vertexShader = getShader(gl, "shader-vs");
 
     shaderProgram = gl.createProgram();
+    console.log(fragmentShader)
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
