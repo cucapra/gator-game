@@ -192,18 +192,6 @@ function animate(){
     app.lastTime = app.timeNow;
 }
 
-function yRotation (angleInRadians) {
-    var c = Math.cos(angleInRadians);
-    var s = Math.sin(angleInRadians);
-
-    return [
-      c, 0, -s, 0,
-      0, 1, 0, 0,
-      s, 0, c, 0,
-      0, 0, 0, 1,
-    ];
-  }
-
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
@@ -212,8 +200,7 @@ function drawScene(){
     
     mat4.translate(app.mvMatrix, [0, 0, -15]);
     
-    app.cMatrix = yRotation(app.cameraAngle+=.1);
-
+    mat4.identity(app.cMatrix);
     //For rotating the camera itself
     //From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
     mat4.rotateX(app.cMatrix,app.rotation[0]++*Math.PI/180);
