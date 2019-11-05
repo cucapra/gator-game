@@ -24,6 +24,7 @@ app.mvMatrixStack = [];
 app.pMatrix = mat4.create();
 app.cMatrix = mat4.create();
 app.rotation = [0,0,0];
+app.cameraAngle = 0;
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -158,8 +159,8 @@ function mvPopMatrix(){
 }
 
 function setMatrixUniforms(){
-    // mat4.inverse(mvMatrix,cMatrix);     //Obtain Camera Matrix from Model-View Matrix
-    // displayMatrix(mvMatrix);
+    mat4.inverse(app.cMatrix, app.mvMatrix);      //Obtain Model-View matrix from Camera Matrix
+    // displayMatrix(cMatrix);
 
     gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, app.pMatrix);
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
@@ -190,6 +191,18 @@ function animate(){
     app.lastTime = app.timeNow;
 }
 
+function yRotation (angleInRadians) {
+    var c = Math.cos(angleInRadians);
+    var s = Math.sin(angleInRadians);
+
+    return [
+      c, 0, -s, 0,
+      0, 1, 0, 0,
+      s, 0, c, 0,
+      0, 0, 0, 1,
+    ];
+  }
+
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
@@ -197,10 +210,14 @@ function drawScene(){
     // move the camera
     
     mat4.translate(app.mvMatrix, [0, 0, -15]);
-    rotation = [90,90,90];
-    mat4.rotateX(app.mvMatrix,app.rotation[0]++*Math.PI/180);
-    mat4.rotateY(app.mvMatrix,app.rotation[1]++*Math.PI/180);
-    mat4.rotateZ(app.mvMatrix,app.rotation[2]++*Math.PI/180);
+    
+    app.cMatrix = yRotation(app.cameraAngle+=.1);
+    mat4.translate(app.cMatrix,[0, 0, 20]);
+
+    //For rotating the camera itself (change app.rotation to use)
+    mat4.rotateX(app.cMatrix,app.rotation[0]*Math.PI/180);
+    mat4.rotateY(app.cMatrix,app.rotation[1]*Math.PI/180);
+    mat4.rotateZ(app.cMatrix,app.rotation[2]*Math.PI/180);
     // mat4.translate(app.mvMatrix, [0, 0, -5]);
     // set up the scene
     mvPushMatrix();
