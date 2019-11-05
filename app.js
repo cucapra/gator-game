@@ -1,6 +1,5 @@
 // var fs = require('fs');
 
-// import OBJ from 'webgl-obj-loader';
 // var meshPath = './development/models/sphere.obj';
 // var opt = { encoding: 'utf8' };
 
@@ -8,6 +7,13 @@
 //   if (err) return console.error(err);
 //   var mesh = new OBJ.Mesh(data);
 // });
+
+import * as OBJ from 'webgl-obj-loader';
+import { mat4, mat3 } from 'gl-matrix';
+import * as normals from 'normals';
+import * as teapot from 'teapot';
+import pack from 'array-pack-2d';
+// import { OBJ } from 'webgl-obj-loader';
 
 // WebGL context
 var gl = {};
@@ -37,7 +43,7 @@ window.requestAnimFrame = (function (){
 })();
 
 function initWebGL(canvas){
-    try{
+    try {
         // Try to grab the standard context. If it fails, fallback to experimental.
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     }
@@ -54,6 +60,7 @@ function initWebGL(canvas){
 }
 
 function getShader(gl, id){
+    // Refers to external HTML
     var shaderScript = document.getElementById(id);
     if (!shaderScript){
         return null;
@@ -79,6 +86,8 @@ function getShader(gl, id){
 
     gl.shaderSource(shader, str);
     gl.compileShader(shader);
+
+  
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
         alert(gl.getShaderInfoLog(shader));
@@ -116,7 +125,7 @@ function initShaders(){
     shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
 }
 
-function drawObject(model){
+function drawObject(obj){
     /*
      Takes in a model that points to a mesh and draws the object on the scene.
      Assumes that the setMatrixUniforms function exists
@@ -124,29 +133,29 @@ function drawObject(model){
      */
 //    gl.useProgram(shaderProgram);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, model.mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.vertexBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, obj.mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.normalBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, model.mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.normalBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, obj.mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    if (model.mesh.textures.length){
+    if (obj.mesh.textures.length){
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.textureBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, model.mesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.textureBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, obj.mesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
     }
     else{
         gl.disableVertexAttribArray(shaderProgram.textureCoordAttribute);
     }
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.mesh.indexBuffer);
     setMatrixUniforms();
-    gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, obj.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
 
 function mvPushMatrix(){
     var copy = mat4.create();
-    mat4.set(app.mvMatrix, copy);
+    mat4.copy(copy, app.mvMatrix);
     app.mvMatrixStack.push(copy);
 }
 
@@ -165,8 +174,9 @@ function setMatrixUniforms(){
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
     var normalMatrix = mat3.create();
-    mat4.toInverseMat3(app.mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
+    mat3.fromMat4(app.mvMatrix, normalMatrix);
+    mat3.invert(normalMatrix, normalMatrix);
+    mat3.transpose(normalMatrix, normalMatrix);
     gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
 }
 
@@ -185,15 +195,17 @@ function animate(){
     app.timeNow = new Date().getTime();
     app.elapsed = app.timeNow - app.lastTime;
     if (app.lastTime != 0){
-        // do animations
+        mat4.rotateZ(app.mvMatrix, app.mvMatrix, .01);
     }
     app.lastTime = app.timeNow;
 }
 
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0, app.pMatrix);
+    
     mat4.identity(app.mvMatrix);
+    mat4.perspective(app.pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0);
+    // mat4.translate(app.mvMatrix, [0, 0, -15]);
     // move the camera
     
     mat4.translate(app.mvMatrix, [0, 0, -15]);
@@ -207,11 +219,10 @@ function drawScene(){
 
     //Translate camera backwards after rotation to look into the scene
     mat4.translate(app.cMatrix,[0, 0, 20]);
-
+  
     // set up the scene
     mvPushMatrix();
-        drawObject(app.models.obj_name);
-        drawObject(app.models.obj_name2);
+    drawObject(app.models.obj_name);
     mvPopMatrix();
 }
 
@@ -232,12 +243,12 @@ function webGLStart(meshes){
     
     
     tick()
-//    drawScene();
+    // drawScene();
 }
 
 window.onload = function (){
     OBJ.downloadMeshes({
-        'obj_name': 'http://localhost:1337/models/caiman.obj',
-        'obj_name2': 'http://localhost:1337/models/lion-cub.obj'
+        'obj_name': 'models/caiman.obj',
+        'obj_name2': 'models/lion-cub.obj'
     }, webGLStart);
 }
