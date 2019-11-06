@@ -133,7 +133,7 @@ function drawObject(mesh){
      Assumes that the setMatrixUniforms function exists
      as well as the shaderProgram has a uniform attribute called "samplerUniform"
      */
-
+    
    gl.useProgram(shaderProgram);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, mesh.positions);
@@ -247,7 +247,15 @@ function drawScene(){
     // set up the scene
     mvPushMatrix();
 
-    drawObject(app.meshes);
+    //draw objects
+    if(app.meshes && Object.keys(app.meshes).length > 0){
+        Object.keys(app.meshes).forEach(function(key) {
+            if(key)
+            drawObject(app.meshes[key]);
+            
+            console.log(key);
+        });
+    }
         
     mvPopMatrix();
 }
@@ -258,15 +266,13 @@ function tick(){
     animate();
 }
 
-function webGLStart(meshes){
-    app.meshes = meshes;
-    canvas = document.getElementById('mycanvas');
+function webGLStart(){
+
     var mp = require('mouse-position');
     mpos = mp(canvas);
     var mb = require('mouse-pressed');
     mbut = mb(canvas);
 
-    gl = initWebGL(canvas);
     initShaders();
     gl.clearColor(0.2, 0.75, 0.75, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -275,15 +281,35 @@ function webGLStart(meshes){
     // drawScene();
 }
 
+// obj name used as key to add and delete obj from scene
+// file location is a string 
+
+function addModel(objName, fileLocation) {
+
+    var wavefrontString = fs.readFileSync(__dirname + '/models/caiman.obj', 'utf8');
+    var mesh = loader.load_obj(gl, wavefrontString);
+
+    app.meshes[objName] = mesh;
+    console.log(app.meshes);
+}
+
+function removeModel(objName) {
+
+    if (app.meshes.hasOwnProperty(objName)) {           
+        delete app.meshes[objName];
+    }
+}
+
+
 
 
 window.onload = function (){
-    var wavefrontString = fs.readFileSync(__dirname + '/models/caiman.obj', 'utf8').toString();
-    var parsedJSON = parseWFObj(wavefrontString);
 
     canvas = document.getElementById('mycanvas');
     gl = initWebGL(canvas);
 
-    var mesh = loader.load_obj(gl, wavefrontString);
-    webGLStart(mesh);
+    addModel('caiman', '/models/caiman.obj');
+    addModel('lion', '/models/die.obj');
+
+    webGLStart();
 }
