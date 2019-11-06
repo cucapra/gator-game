@@ -252,8 +252,8 @@ function drawScene(){
     var height = canvas.height;
     var width = canvas.width;
     if(mbut.left){
-        mat4.rotateY(app.cMatrix, app.cMatrix, -panspeed*(mpos.x - mpos.prevX) / width);
-        mat4.rotateX(app.cMatrix, app.cMatrix, -panspeed*(mpos.y - mpos.prevY) / height);
+        mat4.rotateY(app.cMatrix, app.cMatrix, -panspeed*(mpos[0] - mpos.prev[0]) / width);
+        mat4.rotateX(app.cMatrix, app.cMatrix, -panspeed*(mpos[1] - mpos.prev[1]) / height);
     }
     
     // set up the scene
