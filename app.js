@@ -29,15 +29,14 @@ app.mvMatrix = mat4.create();
 app.mvMatrixStack = [];
 app.pMatrix = mat4.create();
 app.cMatrix = mat4.create(); //Camera matrix
-mat4.translate(app.cMatrix, app.cMatrix, [0, 0, 15]); //Move backwards to see object
-// app.rotation = [0,0,0]; // rotation for camera
-// app.camera;
-// app.cameraView;
-// app.cameraLoc = [0,0,0];
+mat4.translate(app.cMatrix, app.cMatrix, [0, 0, 15]); //Move backwards initially to see object
 // For detecting key presses
-var key = require('key-pressed')
+var key = require('key-pressed');
+//For getting mouse position and button press
 var mpos; var mbut;
+// Pan and move speed
 var panspeed = 2;
+var movespeed = 1;
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -216,37 +215,37 @@ function drawScene(){
     // move the camera
     var W = key('W');
     if(W){
-        mat4.translate(app.cMatrix, app.cMatrix, [0,0,-1]);
+        mat4.translate(app.cMatrix, app.cMatrix, [0,0,-movespeed]);
     }
     var A = key('A');
     if(A){
-        mat4.translate(app.cMatrix, app.cMatrix, [-1,0,0]);
+        mat4.translate(app.cMatrix, app.cMatrix, [-movespeed,0,0]);
     }
     var S = key('S');
     if(S){
-        mat4.translate(app.cMatrix, app.cMatrix, [0,0,1]);
+        mat4.translate(app.cMatrix, app.cMatrix, [0,0,movespeed]);
     }
     var D = key('D');
     if(D){
-        mat4.translate(app.cMatrix, app.cMatrix, [1,0,0]);
+        mat4.translate(app.cMatrix, app.cMatrix, [movespeed,0,0]);
     }
     
     //Keyboard camera rotation
     var UP = key('<up>');
     if(UP){
-        mat4.rotateX(app.cMatrix, app.cMatrix, .03);
+        mat4.rotateX(app.cMatrix, app.cMatrix, .01*panspeed);
     }
     var DOWN = key('<down>');
     if(DOWN){
-        mat4.rotateX(app.cMatrix, app.cMatrix, -.03);
+        mat4.rotateX(app.cMatrix, app.cMatrix, -.01*panspeed);
     }
     var LEFT = key('<left>');
     if(LEFT){
-        mat4.rotateY(app.cMatrix, app.cMatrix, .03);
+        mat4.rotateY(app.cMatrix, app.cMatrix, .01*panspeed);
     }
     var RIGHT = key('<right>');
     if(RIGHT){
-        mat4.rotateY(app.cMatrix, app.cMatrix, -.03);
+        mat4.rotateY(app.cMatrix, app.cMatrix, -.01*panspeed);
     }
 
     //Mouse camera rotation
@@ -282,8 +281,6 @@ function webGLStart(meshes){
     initBuffers();
     gl.clearColor(0.2, 0.75, 0.75, 1.0);
     gl.enable(gl.DEPTH_TEST);
-
-
     
     tick()
     // drawScene();
