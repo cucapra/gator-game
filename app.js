@@ -32,6 +32,9 @@ app.cMatrix = mat4.create(); //Camera matrix
 app.rotation = [0,0,0]; // rotation for camera
 app.camera;
 app.cameraView;
+app.cameraLoc = [0,0,0];
+// For detecting key presses
+var key = require('key-pressed')
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -212,13 +215,30 @@ function drawScene(){
     // mat4.rotateX(app.cMatrix,app.cMatrix,app.rotation[0]++*Math.PI/180);
     // mat4.rotateY(app.cMatrix,app.cMatrix,app.rotation[1]++*Math.PI/180);
     // mat4.rotateZ(app.cMatrix,app.cMatrix,app.rotation[2]++*Math.PI/180);
+
     mat4.translate(app.cMatrix, app.cMatrix, [0, 0, 15]);
+
     app.cameraView = app.camera.view();
-    // app.cMatrix = app.view;
-    // mat4.translate(app.cameraView, app.cameraView, [0, 0, -15]);
-    console.log("cMatrix: ", app.cMatrix);
-    console.log("cView: ", app.cameraView);
-    // app.cMatrix = app.cameraView;
+    mat4.translate(app.cameraView, app.cameraView, [0, 0, -15]);
+
+    var W = key('W');
+    if(W){
+        app.cameraLoc[2]++;
+    }
+    var A = key('A');
+    if(A){
+        app.cameraLoc[0]++;
+    }
+    var S = key('S');
+    if(S){
+        app.cameraLoc[2]--;
+    }
+    var D = key('D');
+    if(D){
+        app.cameraLoc[0]--;
+    }
+    mat4.translate(app.cameraView, app.cameraView, app.cameraLoc);
+
     app.camera.tick();
 
     
@@ -244,7 +264,8 @@ function webGLStart(meshes){
     initBuffers();
     gl.clearColor(0.2, 0.75, 0.75, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    
+
+
     
     tick()
     // drawScene();
