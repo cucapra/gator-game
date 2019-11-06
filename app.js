@@ -30,6 +30,8 @@ app.mvMatrixStack = [];
 app.pMatrix = mat4.create();
 app.cMatrix = mat4.create(); //Camera matrix
 app.rotation = [0,0,0]; // rotation for camera
+app.camera;
+app.cameraView;
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -168,7 +170,8 @@ function mvPopMatrix(){
 
 function setMatrixUniforms(){
     // From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
-    mat4.invert(app.mvMatrix, app.cMatrix);      //Obtain Model-View matrix from Camera Matrix
+    // mat4.invert(app.mvMatrix, app.cMatrix);      //Obtain Model-View matrix from Camera Matrix
+    app.mvMatrix = app.cameraView;
     gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, app.pMatrix);
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
@@ -206,10 +209,18 @@ function drawScene(){
 
     // move the camera
     mat4.identity(app.cMatrix);
-    mat4.rotateX(app.cMatrix,app.cMatrix,app.rotation[0]++*Math.PI/180);
-    mat4.rotateY(app.cMatrix,app.cMatrix,app.rotation[1]++*Math.PI/180);
-    mat4.rotateZ(app.cMatrix,app.cMatrix,app.rotation[2]++*Math.PI/180);
+    // mat4.rotateX(app.cMatrix,app.cMatrix,app.rotation[0]++*Math.PI/180);
+    // mat4.rotateY(app.cMatrix,app.cMatrix,app.rotation[1]++*Math.PI/180);
+    // mat4.rotateZ(app.cMatrix,app.cMatrix,app.rotation[2]++*Math.PI/180);
     mat4.translate(app.cMatrix, app.cMatrix, [0, 0, 15]);
+    app.cameraView = app.camera.view();
+    // app.cMatrix = app.view;
+    // mat4.translate(app.cameraView, app.cameraView, [0, 0, -15]);
+    console.log("cMatrix: ", app.cMatrix);
+    console.log("cView: ", app.cameraView);
+    // app.cMatrix = app.cameraView;
+    app.camera.tick();
+
     
     // set up the scene
     mvPushMatrix();
@@ -226,6 +237,8 @@ function tick(){
 function webGLStart(meshes){
     app.meshes = meshes;
     canvas = document.getElementById('mycanvas');
+    var createCamera = require('canvas-orbit-camera');
+    app.camera = createCamera(canvas);
     gl = initWebGL(canvas);
     initShaders();
     initBuffers();
