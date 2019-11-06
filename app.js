@@ -136,7 +136,7 @@ function drawObject(mesh){
     if (mesh.texcoords){
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texcoords);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute,2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
     }
     else{
         gl.disableVertexAttribArray(shaderProgram.textureCoordAttribute);
@@ -212,7 +212,6 @@ function webGLStart(meshes){
     initShaders();
     gl.clearColor(0.2, 0.75, 0.75, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    
     
     tick()
     // drawScene();
