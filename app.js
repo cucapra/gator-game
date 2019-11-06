@@ -28,6 +28,8 @@ app.models = {};
 app.mvMatrix = mat4.create();
 app.mvMatrixStack = [];
 app.pMatrix = mat4.create();
+app.cMatrix = mat4.create(); //Camera matrix
+app.rotation = [0,0,0]; // rotation for camera
 
 window.requestAnimFrame = (function (){
     return window.requestAnimationFrame ||
@@ -165,6 +167,8 @@ function mvPopMatrix(){
 }
 
 function setMatrixUniforms(){
+    // From: http://voxelent.com/html/beginners-guide/chapter_4/ch4_ModelView.html
+    mat4.invert(app.mvMatrix, app.cMatrix);      //Obtain Model-View matrix from Camera Matrix
     gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, app.pMatrix);
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
@@ -198,11 +202,15 @@ function animate(){
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    mat4.identity(app.mvMatrix);
     mat4.perspective(app.pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0);
-    // mat4.translate(app.mvMatrix, [0, 0, -15]);
+
     // move the camera
-    mat4.translate(app.mvMatrix, app.mvMatrix, [0, 0, -15]);
+    mat4.identity(app.cMatrix);
+    mat4.rotateX(app.cMatrix,app.cMatrix,app.rotation[0]++*Math.PI/180);
+    mat4.rotateY(app.cMatrix,app.cMatrix,app.rotation[1]++*Math.PI/180);
+    mat4.rotateZ(app.cMatrix,app.cMatrix,app.rotation[2]++*Math.PI/180);
+    mat4.translate(app.cMatrix, app.cMatrix, [0, 0, 15]);
+    
     // set up the scene
     mvPushMatrix();
     drawObject(app.models.obj_name);
