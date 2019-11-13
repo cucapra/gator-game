@@ -179,7 +179,7 @@ function setMatrixUniforms(){
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, app.mvMatrix);
 
     var normalMatrix = mat3.create();
-    mat3.fromMat4(app.mvMatrix, normalMatrix);
+    mat3.fromMat4(normalMatrix, app.mvMatrix);
     mat3.invert(normalMatrix, normalMatrix);
     mat3.transpose(normalMatrix, normalMatrix);
     gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
@@ -252,8 +252,6 @@ function drawScene(){
         Object.keys(app.meshes).forEach(function(key) {
             if(key)
             drawObject(app.meshes[key]);
-            
-            console.log(key);
         });
     }
         
@@ -290,17 +288,14 @@ function addModel(objName, fileLocation) {
     var mesh = loader.load_obj(gl, wavefrontString);
 
     app.meshes[objName] = mesh;
-    console.log(app.meshes);
+
 }
 
 function removeModel(objName) {
-
     if (app.meshes.hasOwnProperty(objName)) {           
         delete app.meshes[objName];
     }
 }
-
-
 
 
 window.onload = function (){
