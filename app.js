@@ -57,40 +57,6 @@ function initWebGL(canvas){
     return gl;
 }
 
-function compileShaders(gl, vertexSource, fragmentSource){
-    var vertShader = gl.createShader(gl.VERTEX_SHADER);
-    var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-
-    gl.shaderSource(vertShader, vertexSource);
-    gl.shaderSource(fragShader, fragmentSource);
-
-    gl.compileShader(vertShader);
-    gl.compileShader(fragShader);
-
-    shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertShader);
-    gl.attachShader(shaderProgram, fragShader);
-    gl.linkProgram(shaderProgram);
-
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)){
-        alert("Could not initialise shaders");
-    }
-    gl.useProgram(shaderProgram);
-
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-    shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-    gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-
-    shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-    gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-
-    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-    shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-
-}
 
 function getShader(gl, id){
     // Refers to external HTML
@@ -100,9 +66,9 @@ function getShader(gl, id){
     else
         shaderScript = require("./vs-gator.lgl");
     console.log(shaderScript);
-    // if (!shaderScript){
-    //     return null;
-    // }
+    if (!shaderScript){
+        return null;
+    }
 
     var shader;
     if (id === "shader-fs"){
