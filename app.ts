@@ -8,13 +8,11 @@ import * as obj_loader from 'webgl-obj-loader';
 // import { OBJ } from 'webgl-obj-loader';
 export type Vec3Array = [number, number, number][];
 
-import {readFileSync} from 'fs';
-
 // var fs = require("fs");
 var __dirname : string;
 
 
-
+import readFileSync from 'fs';
 import key from 'key-pressed';
 import attach from 'mouse-position';
 import pressed from 'mouse-pressed';
@@ -427,7 +425,7 @@ function webGLStart(){
 
 function addModel(objName, fileLocation) {
 
-    var wavefrontString = readFileSync(__dirname + '/models/caiman.obj', 'utf8');
+    var wavefrontString = readFileSync(__dirname + fileLocation, 'utf8');
     var mesh = load_obj(gl, wavefrontString);
 
     app.meshes[objName] = mesh;

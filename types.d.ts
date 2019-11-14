@@ -57,6 +57,7 @@ declare module 'key-pressed' {
 
 declare module 'fs' {
   function readFileSync(txt: string, id: string) : String;
+  export default readFileSync;
 }
 
 declare module 'mouse-position' {
