@@ -57,24 +57,51 @@ function initWebGL(canvas){
     return gl;
 }
 
+function compileShaders(gl, vertexSource, fragmentSource){
+    var vertShader = gl.createShader(gl.VERTEX_SHADER);
+    var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    gl.shaderSource(vertShader, vertexSource);
+    gl.shaderSource(fragShader, fragmentSource);
+
+    gl.compileShader(vertShader);
+    gl.compileShader(fragShader);
+
+    shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertShader);
+    gl.attachShader(shaderProgram, fragShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)){
+        alert("Could not initialise shaders");
+    }
+    gl.useProgram(shaderProgram);
+
+    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+    shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+    gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+
+    shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+    gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
+
+}
+
 function getShader(gl, id){
     // Refers to external HTML
+    var shaderScript;
     if (id === "shader-fs")
-        var shaderScript = require("./compiled_fragment.frag")
+        shaderScript = require("./fs-gator.lgl");
     else
-        var shaderScript = require("./vertex_orig.vert")
-    console.log(shaderScript)
-    if (!shaderScript){
-        return null;
-    }
-
-    // var str = "";
-    // var k = shaderScript.firstChild;
-    // while (k){
-    //     if (k.nodeType == 3){
-    //         str += k.textContent;
-    //     }
-    //     k = k.nextSibling;
+        shaderScript = require("./vs-gator.lgl");
+    console.log(shaderScript);
+    // if (!shaderScript){
+    //     return null;
     // }
 
     var shader;
@@ -87,17 +114,15 @@ function getShader(gl, id){
     gl.shaderSource(shader, shaderScript);
     gl.compileShader(shader);
 
-  
-
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
-        alert(gl.getShaderInfoLog(shader));
-        return null;
+        throw "could not compile shader" + gl.getShaderInfoLog(shader);
     }
 
     return shader;
 }
 
 function initShaders(){
+
     var fragmentShader = getShader(gl, "shader-fs");
     var vertexShader = getShader(gl, "shader-vs");
 
@@ -132,7 +157,7 @@ function drawObject(obj){
      Assumes that the setMatrixUniforms function exists
      as well as the shaderProgram has a uniform attribute called "samplerUniform"
      */
-//    gl.useProgram(shaderProgram);
+    //gl.useProgram(shaderProgram);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.vertexBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, obj.mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
