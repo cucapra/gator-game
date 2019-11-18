@@ -8,8 +8,9 @@
         varying vec2 vTextureCoord;
         varying vec3 vTransformedNormal;
         varying vec4 vPosition;
+        varying vec4 forFragColor;
         void main(void) {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_FragColor = forFragColor;
         }
     </script>
     <script id="shader-vs" type="x-shader/x-vertex">
@@ -22,12 +23,42 @@
         varying vec2 vTextureCoord;
         varying vec3 vTransformedNormal;
         varying vec4 vPosition;
-        void main(void) {
-            vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-            gl_Position = uPMatrix * vPosition;
-            vTextureCoord = aTextureCoord;
-            vTransformedNormal = uNMatrix * aVertexNormal;
+
+
+
+        varying vec4 forFragColor;
+
+        const vec3 lightPos = vec3(1.0, 1.0, 1.0);
+        const vec3 diffuseColor = vec3(0.5, 0.0, 0.0);
+        const vec3 specColor = vec3(1.0, 1.0, 1.0);
+
+        void main(){
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+        // all following gemetric computations are performed in the
+        // camera coordinate system (aka eye coordinates)
+        vec3 normal = vec3(uMVMatrix * vec4(aVertexNormal, 0.0));
+        vec4 vertPos4 = uMVMatrix * vec4(aVertexPosition, 1.0);
+        vec3 vertPos = vec3(vertPos4) / vertPos4.w;
+        vec3 lightDir = normalize(lightPos - vertPos);
+        vec3 reflectDir = reflect(-lightDir, normal);
+        vec3 viewDir = normalize(-vertPos);
+
+        float lambertian = max(dot(lightDir,normal), 0.0);
+        float specular = 0.0;
+        
+        if(lambertian > 0.0) {
+            float specAngle = max(dot(reflectDir, viewDir), 0.0);
+            specular = pow(specAngle, 4.0);
+
+            specular = pow(specAngle, 16.0);
         }
+        
+        forFragColor = abs(vec4(normal, 1.0));
+        //forFragColor = vec4(lambertian*diffuseColor + specular*specColor, 1.0);
+        }
+                
+                
     </script>
     <!-- <script type="text/javascript" src="gl-matrix.js"></script> -->
     
