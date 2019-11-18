@@ -8,8 +8,11 @@
         varying vec2 vTextureCoord;
         varying vec3 vTransformedNormal;
         varying vec4 vPosition;
+
+        uniform sampler2D texture;
+
         void main(void) {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_FragColor = texture2D(texture, vTextureCoord);
         }
     </script>
     <script id="shader-vs" type="x-shader/x-vertex">
@@ -19,9 +22,11 @@
         uniform mat4 uMVMatrix;
         uniform mat4 uPMatrix;
         uniform mat3 uNMatrix;
+        uniform sampler2D texture;
         varying vec2 vTextureCoord;
         varying vec3 vTransformedNormal;
         varying vec4 vPosition;
+
         void main(void) {
             vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
             gl_Position = uPMatrix * vPosition;

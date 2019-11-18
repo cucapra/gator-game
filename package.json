@@ -10,6 +10,7 @@
     "normals": "^1.1.0",
     "parcel": "^1.12.4",
     "requirejs": "^2.3.6",
+    "resources": "^0.4.3",
     "teapot": "^1.0.0",
     "webgl-obj-loader": "^1.1.3"
   },

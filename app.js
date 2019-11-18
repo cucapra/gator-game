@@ -21,6 +21,7 @@ var gl = {};
 var canvas = null;
 // main shader program
 var shaderProgram = null;
+var texture = null;
 // main app object
 var app = {};
 app.meshes = {};
@@ -54,6 +55,25 @@ function initWebGL(canvas){
     gl.viewportWidth = canvas.width;
     gl.viewportHeight = canvas.height;
     gl.viewport(0, 0, canvas.width, canvas.height);
+
+    // Create a texture.
+    texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    
+    // Fill the texture with a 1x1 blue pixel.
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 255, 0, 255]));
+    
+    // Asynchronously load an image
+    var image = new Image();
+    image.src = require("./resources/f-texture.png");
+    image.addEventListener('load', function() {
+        console.log("caught texture");
+        // Now that the image has loaded make copy it to the texture.
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+    });
+
     return gl;
 }
 
@@ -137,6 +157,7 @@ function drawObject(obj){
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.normalBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, obj.mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+    //Review later
     if (obj.mesh.textures.length){
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, obj.mesh.textureBuffer);
@@ -198,6 +219,17 @@ function animate(){
 function drawScene(){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
+//texture
+    if (gl.getUniformLocation(shaderProgram, "texture") != null) {
+        // Step 1: Activate a "texture unit" of your choosing.
+        gl.activeTexture(gl.TEXTURE0);
+        // Step 2: Bind the texture you want to use.
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        // Step 3: Set the uniform to the "index" of the texture unit you just activated.
+        var textureLocation = gl.getUniformLocation(shaderProgram, "texture");
+        gl.uniform1i(textureLocation, 0);
+    }
+
     mat4.identity(app.mvMatrix);
     mat4.perspective(app.pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.01, 1000.0);
     // mat4.translate(app.mvMatrix, [0, 0, -15]);
@@ -234,4 +266,7 @@ window.onload = function (){
         'obj_name': 'models/caiman.obj',
         'obj_name2': 'models/lion-cub.obj'
     }, webGLStart);
-}
+
+
+
+}  
